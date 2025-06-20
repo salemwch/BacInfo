@@ -23,7 +23,87 @@
   --clr-text-primary: #ffffff;
   --clr-text-muted: #c1c1c1;
     }
+    html {
+  font-size: 16px;
+}
+/* 📱 Mobile Optimization: Make layout responsive */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    padding: 1rem;
+  }
 
+  #terminal {
+    font-size: 12px;
+    padding: 1rem;
+    word-wrap: break-word;
+  }
+
+  #mainContent h1,
+  #mainContent h2 {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  #mainContent p {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  #enter {
+    font-size: 1rem;
+    padding: 0.7rem 1.4rem;
+    display: block;
+    margin: 1.2rem auto;
+  }
+
+  #scrollPaper {
+    font-size: 0.95rem;
+    padding: 1.2rem;
+    border-radius: 10px;
+  }
+
+  #diploma {
+    font-size: 1rem;
+    padding: 0.8rem 1.2rem;
+    margin-top: 1.5rem;
+  }
+
+  #startScreen h1 {
+    font-size: 1.4rem;
+    text-align: center;
+    padding: 1.2rem;
+  }
+
+  #celebration {
+    padding: 1rem;
+    width: 100%;
+  }
+
+  canvas#matrix {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+   #scrollPaper {
+    font-size: 0.95rem;
+    padding: 1.2rem;
+    width: 95%;
+  }
+  #terminal {
+     max-width: 330px;
+  }
+}
+
+@media (max-width: 600px) {
+  html {
+    font-size: 14px;
+  }
+}
     * { box-sizing: border-box; }
     html, body {
       margin: 0;
@@ -48,7 +128,7 @@
     /* ----- TERMINAL BOOT BOX ----- */
     #terminal {
       position: relative;
-      max-width: 640px;
+      width: 600px;
       margin: 0 auto;
       top: 35vh;
       padding: 1.6rem 2rem;
@@ -138,7 +218,7 @@
     #scrollWrapper {
       position: absolute;
       top: 20%;
-      left: 10%;
+      left: 1%;
       height: 60vh;
       width: 0; /* will animate */
       overflow: hidden;
@@ -168,7 +248,7 @@
       transform: translateX(-50%) scale(0.2);
       opacity: 0;
       width: 260px;
-      height: 160px;
+      height: 100px;
       background: rgba(255,255,255,0.95);
       border: 4px solid #d4af37;
       border-radius: 8px;
@@ -179,6 +259,8 @@
       font-size: 1.3rem;
       font-weight: 700;
       color: #1a1a1a;
+       margin: 15px;
+      padding: 15px;
     }
 
     /* Constellation name */
