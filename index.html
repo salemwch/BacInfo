@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System Boot • Salem.exe</title>
+  <!-- Mono font for terminal vibe -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+
+    :root {
+      --bg: #000;
+      --matrix: #00ff9d;
+      --terminal: #00ff9d;
+      --accent: #00ffea;
+       /* Figma‑style palette */
+  --clr-bg: #0f2027;
+  --clr-bg-secondary: #203a43;
+  --clr-bg-tertiary: #2c5364;
+  --clr-accent: #ff8a00;
+  --clr-accent-2: #e52e71;
+  --clr-text-primary: #ffffff;
+  --clr-text-muted: #c1c1c1;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      color: #eaeaea;
+      
+    }
+
+    /* ----- MATRIX RAIN CANVAS ----- */
+    canvas#matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    /* ----- TERMINAL BOOT BOX ----- */
+    #terminal {
+      position: relative;
+      max-width: 640px;
+      margin: 0 auto;
+      top: 35vh;
+      padding: 1.6rem 2rem;
+      background: rgba(0, 0, 0, 0.78);
+      border: 2px solid var(--terminal);
+      color: var(--terminal);
+      font-size: 1.05rem;
+      line-height: 1.4;
+      z-index: 1;
+    }
+
+    /* ----- MAIN CONTENT (celebrate button) ----- */
+    #mainContent {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(145deg, #0f2027, #203a43, #2c5364);
+      backdrop-filter: blur(3px);
+      color: white;
+      transition: opacity 1.2s ease;
+      animation: fadeIn 1s ease forwards;
+      z-index: 2;
+    }
+    #mainContent.hidden { opacity: 0; pointer-events: none; }
+    #mainContent h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #00f2fe, #4facfe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+    button#enter {
+      margin-top: 2rem;
+      padding: 0.9rem 2.5rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--matrix);
+      color: #000;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .15s;
+    }
+    button#enter:hover { transform: scale(1.05); }
+
+    /* ================= Celebration Overlay ================= */
+    #celebration {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      color: white;
+      pointer-events: none;
+      font-size: 2rem;
+      z-index: 1;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    #celebration span{
+      color:tomato;
+    }
+    
+    /* Confetti code tags */
+    #confettiContainer span {
+      position: absolute;
+      top: -5vh;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      opacity: 0.9;
+      animation-name: fall;
+      animation-timing-function: linear;
+      animation-iteration-count: 1;
+      user-select: none;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
+    }
+
+    /* Scroll message */
+    #scrollWrapper {
+      position: absolute;
+      top: 20%;
+      left: 10%;
+      height: 60vh;
+      width: 0; /* will animate */
+      overflow: hidden;
+      border-left: 6px solid #bfa76f;
+      border-right: 6px solid #bfa76f;
+      background: url('https://images.unsplash.com/photo-1601597111035-15154e96232f?auto=format&fit=crop&w=800&q=60');
+      background-size: cover;
+      box-shadow: 0 0 12px #bfa76f;
+    }
+    #scrollPaper {
+      padding: 3rem 2rem;
+      color: #222;
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.5;
+      background: rgba(255,255,255,0.9);
+      height: 100%;
+    }
+
+    /* Diploma */
+    #diploma {
+      position: absolute;
+      margin: 15px;
+      padding: 15px;
+      bottom: -50vh;
+      left: 50%;
+      transform: translateX(-50%) scale(0.2);
+      opacity: 0;
+      width: 260px;
+      height: 160px;
+      background: rgba(255,255,255,0.95);
+      border: 4px solid #d4af37;
+      border-radius: 8px;
+      box-shadow: 0 0 18px #d4af37;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    /* Constellation name */
+    #starName {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.7);
+      opacity: 0;
+      font-size: 3rem;
+      letter-spacing: 4px;
+      color: #fff;
+      text-shadow:
+        0 0 4px #fff,
+        0 0 8px #00ccff,
+        0 0 16px #00ccff;
+    }
+    #startScreen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  z-index: 9999;
+  cursor: pointer;
+}
+
+  </style>
+</head>
+<body>
+  <!-- Matrix rain canvas -->
+  <canvas id="matrix"></canvas>
+
+  <!-- Boot‑up terminal box -->
+  <div id="terminal"></div>
+  <div id="startScreen">
+  <h1>Click anywhere to start</h1>
+</div>
+  <!-- Main screen with button -->
+  <section id="mainContent" class="hidden">
+  <h1>Graduation Mode: ACTIVATED ✅</h1>
+  <h2>Welcome, Code Whisperer!</h2>
+  <p>Baccalaureate Info • Class of 2025</p>
+  <button id="enter">Celebrate 🎉</button>
+</section>
+
+
+
+  <!-- Celebration overlay elements (initially invisible) -->
+   
+  <div id="celebration">
+    <div id="confettiContainer"></div>
+    <div id="scrollWrapper"><div id="scrollPaper">
+      From 0s and 1s you forged dreams.<br>
+      From bugs and breakpoints you forged destiny.<br>
+      Today the system salutes you: Graduate, happy success <span> coder </span>  , Developer of Tomorrow. 
+    </div></div>
+    <div id="diploma">Baccalaureate genius unlocked congratulation  ✅ 🏆</div>
+  </div>
+
+  <!-- Audio files -->
+  <audio id="typeSound" src="sounds/typing.mp3" preload="auto"></audio>
+<audio id="beepSound" src="sounds/beep.mp3" preload="auto"></audio>
+<audio id="popSound" src="sounds/pop.mp3" preload="auto"></audio>
+<audio id="voiceWelcome" src="sounds/welcome.mp3" preload="auto"></audio>
+
+
+
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <script>
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  const letters = '01';
+  const fontSize = 16;
+  const columns = Math.floor(window.innerWidth / fontSize);
+  const drops = Array(columns).fill(1);
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'var(--matrix)';
+    ctx.font = fontSize + 'px JetBrains Mono';
+    drops.forEach((y, i) => {
+      const text = letters[Math.floor(Math.random() * letters.length)];
+      ctx.fillText(text, i * fontSize, y * fontSize);
+      drops[i] = y * fontSize > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
+    });
+    requestAnimationFrame(drawMatrix);
+  }
+  drawMatrix();
+  window.addEventListener('load', () => {
+  document.body.addEventListener('click', () => {
+    const startScreen = document.getElementById('startScreen');
+    startScreen.style.display = 'none'; // hide it
+    typeLine(); // ⬅️ start your typing animation
+  }, { once: true });
+});
+
+  const terminal = document.getElementById('terminal');
+  const lines = [
+    'System Boot: Salem.exe',
+    'Graduation Mode: ACTIVATED✅',
+    '✔ Baccalaureate Info 2025',
+    '',
+    'Welcome back, Salem',
+    'You\'ve completed:',
+    '   - 1x Final Exam Boss Fight',
+    '   - 40+ Logical Battles',
+    '   - 100+ Lines of Brilliance',
+    'Mission: Graduation Unlocked ✅'
+  ];
+  const typeSound = document.getElementById('typeSound');
+  const beepSound = document.getElementById('beepSound');
+  const popSound = document.getElementById('popSound');
+  const voice = document.getElementById('voiceWelcome');
+
+  let lineIdx = 0, charIdx = 0;
+  function typeLine() {
+   if (lineIdx >= lines.length) {
+  typeSound.pause();
+  typeSound.currentTime = 0;
+  voice.play().catch(() => {});
+  setTimeout(() => {
+    document.getElementById('mainContent').classList.remove('hidden');
+  }, 12000);
+  return;
+}
+
+
+    const cur = lines[lineIdx];
+    if (charIdx === 0) terminal.appendChild(document.createElement('div'));
+    const lineDiv = terminal.children[lineIdx];
+    lineDiv.textContent = cur.slice(0, charIdx + 1);
+    if (cur[charIdx] !== ' ') {
+      typeSound.currentTime = 0;
+      typeSound.play().catch(() => {});
+    }
+    charIdx++;
+    if (charIdx < cur.length) {
+      setTimeout(typeLine, 100);
+    } else {
+      charIdx = 0;
+      lineIdx++;
+      beepSound.currentTime = 0;
+      beepSound.play().catch(() => {});
+      setTimeout(typeLine, 350);
+    }
+  }
+
+  // Wait for click to unlock audio context
+  window.addEventListener('load', () => {
+    document.body.addEventListener('click', () => {
+      // Preload and unlock audio
+      [typeSound, beepSound, popSound, voice].forEach(sound => {
+        sound.play().catch(() => {});
+        sound.pause();
+      });
+      typeLine();
+    }, { once: true });
+  });
+
+  const enterBtn = document.getElementById('enter');
+  const confettiContainer = document.getElementById('confettiContainer');
+
+  function launchCodeConfetti() {
+    const tags = ['<div>', '{}', 'console.log("Congrats")'];
+    for (let i = 0; i < 60; i++) {
+      const span = document.createElement('span');
+      span.textContent = tags[Math.floor(Math.random() * tags.length)];
+      span.style.left = Math.random() * 100 + 'vw';
+      span.style.animationDuration = 3 + Math.random() * 3 + 's';
+      span.style.fontSize = 12 + Math.random() * 16 + 'px';
+      confettiContainer.appendChild(span);
+    }
+    setTimeout(() => confettiContainer.innerHTML = '', 7000);
+  }
+
+  function startCelebration() {
+    enterBtn.disabled = true;
+    popSound.play().catch(() => {});
+    gsap.to('#mainContent', {
+      opacity: 0,
+      duration: 0.8,
+      onComplete: () => document.getElementById('mainContent').classList.add('hidden')
+    });
+    confetti({ particleCount: 180, spread: 120, origin: { y: 0.6 } });
+    launchCodeConfetti();
+
+    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+    tl.to('#scrollWrapper', { width: '80%', duration: 1.6, delay: 0.5 })
+      .to('#diploma', { y: '-60vh', opacity: 1, scale: 1, duration: 1.4, ease: 'back.out(1.7)' }, '+=0.5')
+      .to('#starName', { opacity: 1, scale: 1, duration: 1.8 }, '+=0.6');
+  }
+
+  enterBtn.addEventListener('click', startCelebration);
+</script>
+
+</body>
+</html>
